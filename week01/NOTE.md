@@ -217,3 +217,10 @@ class Spider_nameSpider(scrapy.Spider):
       item['itemN'] = itemN
       yield item
 ```
+## Selector选择器，xpath常用方法
+- “\\”表示从头开始查找，通常用法'\\标签[@属性]'
+- “.\”表示从当前路径开始查找，通常用法'\标签\text()'，'\标签\@属性'
+- “..\”表示平级查找
+   ### 提取内容常用方法
+   - extract(),提取全部内容
+   - extract_first()，提取第一部分

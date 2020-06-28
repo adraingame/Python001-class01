@@ -133,23 +133,23 @@ scrapy crawl spider_name
 
 ## itmes的定义，items不是一开始定义好的，可以跟随项目一点点更新
 
-```
+```python
 import scrapy
 
 class SpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    title = scrapy.Field()
-    link = scrapy.Field()
-    plan_date = scrapy.Field()
-    film_type = scrapy.Field()
+    item1 = scrapy.Field()
+    item2 = scrapy.Field()
+    ...
+    itemN = scrapy.Field()
 ```
 ## setting设置项
-```
+```python
 # 模拟请求
 USER_AGENT = 'spider (+http://www.yourdomain.com)'
 ```
-```
+```python
 # 延时处理
 DOWNLOAD_DELAY = 3
 ```
@@ -157,10 +157,10 @@ DOWNLOAD_DELAY = 3
 - COOKIES_ENABLED = False，通过cookies设置的，以及响应设置的cookie，全部无效。
 - 想要设置自己的cookie，而不想添加任何 response 设置的多余的cookie，怎么办
 经过测试，使用 headers 参数可以添加，我们把 COOKIES_ENABLED 设置为 False
-```
+```python
 COOKIES_ENABLED =False
 ```
-```
+```python
 # 打开此项pipline才会有相应的内容输出
 ITEM_PIPELINES = {
    'spider.pipelines.SpiderPipeline': 300,
@@ -175,3 +175,45 @@ ITEM_PIPELINES = {
 >6. engine获取到response之后，返回给spider，spider的parse()方法对获取到的response进行处理，解析出items或者requests
 >7. 将解析出来的items或者requests发送给engine
 >8. engine获取到items或者requests，将items发送给ItemPipeline，将requests发送给scheduler（ps，只有调度器中不存在request时，程序才停止，及时请求失败scrapy也会重新进行请求）
+## spider_name.py
+代码加注释的方式说明用法
+```python
+# -*- coding: utf-8 -*-
+import scrapy
+# 导入item的模块
+from project_name.items import Project_nameItem
+# Selector选择器模块，使用Xpath
+from scrapy.selector import Selector
+
+
+class Spider_nameSpider(scrapy.Spider):
+    name = 'spider_name'
+    allowed_domains = ['object.com']
+    start_urls = ['https://object.com/somecontent']
+
+    def start_requests(self):
+      # 处理首页逻辑
+      url = ...
+      yield scrapy.Request(url=url, callback=self.parse)
+
+    def parse(self, response):
+      item1 = ...
+      item2 = ...
+      item = Project_nameItem()
+      item['item1'] = item1
+      item['item2'] = item2
+      yield scrapy.Request(url=item2, meta={'item': item}, callback=self.parse2)
+
+    def parse2(self, response):
+      item = response.meta['item']
+      item3 = ...
+      item['item3'] = item3
+      yield scrapy.Request(url=item2, meta={'item': item}, callback=self.parse3)
+   
+   ...
+   def parseN(self, response):
+      item = response.meta['item']
+      itemN = ...
+      item['itemN'] = itemN
+      yield item
+```

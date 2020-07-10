@@ -57,7 +57,7 @@ DOWNLOADER_MIDDLEWARES = {
    'maoyanmovie.middlewares.MaoyanmovieDownloaderMiddleware': 543,
    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-   'proxyspider.middlewares.RandomHttpProxyMiddleware': 400,
+   'maoyanmovie.middlewares.RandomHttpProxyMiddleware': 400,
 }
 
 HTTP_PROXY_LIST = [

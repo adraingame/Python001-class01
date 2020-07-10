@@ -12,7 +12,7 @@ try:
     browser.find_element_by_xpath('//input[@name="password"]').send_keys('liuhedong123')
     time.sleep(5)
     browser.find_element_by_xpath('//button[@type="black"]').click()
-    time.sleep(5)
+    time.sleep(15)
 
     cookies = browser.get_cookies() # 获取cookies
     print(cookies)

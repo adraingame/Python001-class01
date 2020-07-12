@@ -3,6 +3,8 @@ import subprocess
 import os
 import sys
 import json
+from multiprocessing.pool import Pool
+import multiprocessing
 
 def get_iplist(iplist):
     if '-' in iplist:
@@ -28,7 +30,7 @@ def func_ping(ip):
             flag = 0
             break
     if flag == 0:
-        return 0
+        pass
     else:
         print(f'{ip} 可用')
         ip_used = ip
@@ -37,25 +39,23 @@ def func_ping(ip):
     subt.stdout.close()
     subt.wait()
 
-def func_tcp(ip):
-    min_port = 1
-    max_port = 1024
-    print(f'扫描端口的范围为{min_port}--{max_port}')
+def func_tcp(ip, port):
+    
     port_list = []
-    for port in range(min_port, max_port+1):
-        print(f'开始扫描端口：{port}')
-        print(f"nc -vz -w 2 {ip} {port}")
-        commond = f"nc -vz -w 2 {ip} {port}"
-        subt = subprocess.Popen(commond, shell=True,
-                                stdout=subprocess.PIPE, encoding='utf-8')
-        line = subt.stdout.readlines()
-        print(line)
-        if 'successed' in line:
-            print(f'端口：{port} 可用')
-            port_list.append(port)
-            break
-        subt.stdout.close()
-        subt.wait()
+    # for port in range(min_port, max_port+1):
+    print(f'开始扫描端口：{port}')
+    print(f"nc -vz -w 2 {ip} {port}")
+    commond = f"nc -vz -w 2 {ip} {port}"
+    subt = subprocess.Popen(commond, shell=True,
+                            stdout=subprocess.PIPE, encoding='utf-8')
+    line = subt.stdout.readlines()
+    print(line)
+    if 'successed' in line:
+        print(f'端口：{port} 可用')
+        port_list.append(port)
+        # break
+    subt.stdout.close()
+    subt.wait()
     return port_list
     
 
@@ -73,24 +73,41 @@ if __name__ == "__main__":
     cmd_info = parser.parse_args()
     iplist = get_iplist(cmd_info.Ip)
     print(iplist)
+    p = Pool(cmd_info.Num)
     if cmd_info.Func == 'ping':
-        iplist_used = []
+        # iplist_used = []
         # for ip in iplist:
         #     ip_used = func_ping(ip)
         #     iplist_used.append(ip_used)
 
-        with open('./iplist.txt','a+') as f:
-            for ip in iplist:
-                    ip_used = func_ping(ip)
-                    if ip_used:
-                        iplist_used.append(ip_used)
-                        f.write(ip_used + '\n')
+        # with open('./iplist.txt','a+') as f:
+        
+        for ip in iplist:
+            p.apply_async(func_ping, args=(ip,))
+        #             ip_used = func_ping(ip)
+        #             if ip_used:
+        #                 iplist_used.append(ip_used)
+        #                 f.write(ip_used + '\n')
+        p.close()
+        p.join()
+        # print("父进程结束。")
+        p.terminate()
     else:
-        port_list = func_tcp(iplist)
-        print(f"{iplist} 可用的端口列表为 {port_list}")
-        # port_dict = {"{iplist}":port_list}
-        # 暂时先不做保存到json
-        # if cmd_info.Write:
-        #     with open("../config/record.json","w") as f:
-        #     json.dump(new_dict,f)
-        #     print("加载入文件完成...")
+        min_port = 1
+        max_port = 1024
+        
+        print(f'扫描端口的范围为{min_port}--{max_port}')
+        for port in range(min_port, max_port+1):
+            # port_list = func_tcp(iplist)
+            p.apply_async(func_tcp, args=(iplist, port))
+        p.close()
+        p.join()
+        # print("父进程结束。")
+        p.terminate()
+            # print(f"{iplist} 可用的端口列表为 {port_list}")
+            # port_dict = {"{iplist}":port_list}
+            # 暂时先不做保存到json
+            # if cmd_info.Write:
+            #     with open("../config/record.json","w") as f:
+            #     json.dump(new_dict,f)
+            #     print("加载入文件完成...")

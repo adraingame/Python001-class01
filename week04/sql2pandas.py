@@ -12,27 +12,37 @@ import numpy as np
 # 1. SELECT * FROM data;
 import pymysql
 
-con = pymysql.connect('id', 'name', 'age')
-test_data = pd.read_sql('selcect * from data', con)
+con = pymysql.connect('id', 'order_id', 'name', 'age')
+df = pd.read_sql('selcect * from data', con)
  
 # 2. SELECT * FROM data LIMIT 10;
-test_data.head(10) 
+df.head(10) 
 
 # 3. SELECT id FROM data;  //id 是 data 表的特定一列
-test_data['id']
+df['id']
 
 # 4. SELECT COUNT(id) FROM data;
-test_data['id'].value_counts()
+df['id'].value_counts()
  
 # 5. SELECT * FROM data WHERE id<1000 AND age>30;
-test_data[(test_data['id']<1000) & (test_data['age']>30)]
+df(df['id']<1000) & (df['age']>30)]
 
 # 6. SELECT id,COUNT(DISTINCT order_id) FROM table1 GROUP BY id;
+con_table1 = pymysql.connect('id', 'order_id', 'name', 'age')
+table1_data = pd.read_sql('selcect * from table1', con_table1)
+dfs = table1_data.groupby('id').groups
+for df in dfs:
+    df[df['id'] & df['order_id'].unique()]
+
  
 # 7. SELECT * FROM table1 t1 INNER JOIN table2 t2 ON t1.id = t2.id;
+pd.merge(df1, df2, on = 'id', how = 'inner')
  
 # 8. SELECT * FROM table1 UNION SELECT * FROM table2;
+pd.concat([df1, df2], ignore_index = True).drop_duplicates()
  
 # 9. DELETE FROM table1 WHERE id=10;
- 
+df.drop([df['id']=10], axis = 0)
+
 # 10. ALTER TABLE table1 DROP COLUMN column_name;
+df.drop(['column_name'], axis = 1)

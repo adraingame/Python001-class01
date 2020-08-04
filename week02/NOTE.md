@@ -79,3 +79,37 @@ class JobspiderPipeline(object):
 
 
 这周的课程让我感觉到做好爬虫还需要很多技术积累
+
+## 简单的模拟登陆
+需要selenium中的webdriver模块
+selenium模块需要pip安装
+```
+pip install selenium
+```
+导入webdriver
+```python
+form selenium import webdriver
+```
+webdriver需要下载对应浏览器，对应版本的驱动，并放到指定目录（可以放到python的安装目录）
+调用webdriver
+'''python
+browser = webdriver.Chrome()
+url = 'https://www.douban.com'
+browser.get(url)
+'''
+找到登陆用户名密码的元素find_element_by_xpath()，使用send_keys()传输数据
+```python
+browser.find_element_by_xpath('//input[@name="mobileOrEmail"]').send_keys('raingame@163.com')
+```
+找到登陆按钮，模拟点击click()
+```python
+browser.find_element_by_xpath('//input[@name="mobileOrEmail"]').click()
+```
+获取cookies
+```python
+cookies = browser.get_cookies()
+```
+关闭浏览器
+```python
+brower.close()
+```

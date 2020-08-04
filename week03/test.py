@@ -1,10 +1,7 @@
 import argparse
 import subprocess
-import os
-import sys
 import json
 from multiprocessing.pool import Pool
-import multiprocessing
 
 def get_iplist(iplist):
     if '-' in iplist:
@@ -53,7 +50,6 @@ def func_tcp(ip, port):
     subt.stdout.close()
     subt.wait()
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num', dest='Num', type=int, help='target Num')
@@ -66,16 +62,13 @@ if __name__ == "__main__":
     print(iplist)
     p = Pool(cmd_info.Num)
     if cmd_info.Func == 'ping':
-        
         for ip in iplist:
             p.apply_async(func_ping, args=(ip,))
         p.close()
         p.join()
-        p.terminate()
     else:
         min_port = 1
         max_port = 1024
-        
         print(f'扫描端口的范围为{min_port}--{max_port}')
         for port in range(min_port, max_port+1):
             p.apply_async(func_tcp, args=(iplist, port))
